@@ -1,9 +1,12 @@
 import os
 from dotenv import load_dotenv
+load_dotenv()
+key = os.environ.get("GEMINI_API_KEY", "NOT SET")
+print(f"Key starts with: {key[:10]}... length: {len(key)}")
+
 from src.bcm_crew import create_bcm_crew
 from simulation_engine import SimulationEngine
 
-load_dotenv()
 
 # INSTRUCTOR: Change this before each live round
 EVENT_SCENARIO = "ransomware"  # or "cloud_outage_ddos"
