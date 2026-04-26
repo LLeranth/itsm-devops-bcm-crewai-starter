@@ -1,35 +1,28 @@
 import os
 from dotenv import load_dotenv
+from src.problem_crew import create_problem_crew
+
+# Load environment variables
 load_dotenv()
-key = os.environ.get("GEMINI_API_KEY", "NOT SET")
-print(f"Key starts with: {key[:10]}... length: {len(key)}")
 
-from src.bcm_crew import create_bcm_crew
-from simulation_engine import SimulationEngine
+def run():
+    print("--- Starting FinServe Problem Management Analysis ---")
+    
+    # Define inputs for the agents
+    inputs = {
+        'incident_report_path': os.getenv('INCIDENT_DATA_PATH'),
+        'cmdb_path': os.getenv('CMDB_DATA_PATH'),
+        'change_log_path': os.getenv('CHANGE_DATA_PATH')
+    }
 
+    # Initialize the crew
+    problem_management_crew = create_problem_crew()
+    
+    # Run the crew
+    result = problem_management_crew.kickoff(inputs=inputs)
+    
+    print("\n--- FINAL PROBLEM MANAGEMENT REPORT ---")
+    print(result)
 
-# INSTRUCTOR: Change this before each live round
-EVENT_SCENARIO = "ransomware"  # or "cloud_outage_ddos"
-
-EVENTS = {
-    "ransomware": "A ransomware attack has encrypted the primary data center. Mobile banking and transfers are down. No data exfiltrated yet.",
-    "cloud_outage_ddos": "AWS us-east-1 is experiencing a major outage + simultaneous DDoS. All services degraded."
-}
-
-event_description = EVENTS[EVENT_SCENARIO]
-
-print(f"🚨 INSTRUCTOR TRIGGERED EVENT: {EVENT_SCENARIO.upper()}")
-print(f"Description: {event_description}\n")
-
-crew = create_bcm_crew()
-result = crew.kickoff(inputs={"event_description": event_description})
-
-print("\n" + "="*80)
-print("FINAL RECOVERY PLAN FROM STUDENT AGENTS:")
-print(result)
-print("="*80)
-
-# Auto-grade
-engine = SimulationEngine()
-score = engine.evaluate(result, EVENT_SCENARIO)
-print(f"\n🎯 OVERALL KPI SCORE: {score['overall_kpi_score']}%")
+if __name__ == "__main__":
+    run()

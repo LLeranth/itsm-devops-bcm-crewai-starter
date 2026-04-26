@@ -1,29 +1,47 @@
 from crewai import Task
-from src.agents import create_agents
-
-agents = create_agents()
-
-task1 = Task(
-    description="Detect the event, classify severity (minor/major/catastrophic), and create the initial incident record. Event: {event_description}",
-    agent=agents[0],
-    expected_output="Clear severity classification + incident ID + immediate invocation of BCM plan"
+from src.agents import (
+    trend_analyst, 
+    cmdb_correlator, 
+    root_cause_investigator, 
+    known_error_author, 
+    change_proposer
 )
 
-task2 = Task(
-    description="Perform full business impact assessment. Map every affected service to RTO/RPO, customer count, revenue loss, and regulatory risk. Prioritize recovery order.",
-    agent=agents[1],
-    expected_output="Prioritized recovery list with exact impact numbers and business justification"
+# 1. Problem Detection (Stage 1)
+detection_task = Task(
+    description="Analyze the incident CSV data to recognize shared causes and clusters using trend analysis. Group by service, error codes, and time windows[cite: 40, 41, 129].",
+    agent=trend_analyst,
+    expected_output="Candidate pattern clusters with statistical summaries (counts, frequencies)[cite: 73, 136]."
 )
 
-task3 = Task(
-    description="Build and execute the automated recovery plan using DevOps automation. Include failover steps, feedback loops, and estimated timestamps that meet the 4-hour RTO.",
-    agent=agents[2],
-    expected_output="Step-by-step numbered recovery plan with automation commands and verification steps"
+# 2. Problem Logging & Classification (Stage 2)
+correlation_task = Task(
+    description="Enrich detected patterns by querying the CMDB and change logs. Link incidents to specific Configuration Items (CIs) and recent deployments[cite: 45, 50, 73].",
+    agent=cmdb_correlator,
+    expected_output="Enriched patterns including CI data, dependency mappings, and related change IDs[cite: 73].",
+    context=[detection_task] # Context chaining [cite: 76, 145]
 )
 
-task4 = Task(
-    description="Generate and send all stakeholder communications (customers, executives, regulators). Keep messages calm, transparent, and actionable.",
-    agent=agents[3],
-    expected_output="Full set of ready-to-send messages with timestamps",
-    context=[task1, task2, task3]
+# 3. Root Cause Analysis (Stage 3)
+investigation_task = Task(
+    description="Perform a structured 'Five Whys' analysis for each pattern to determine the underlying cause. Cross-reference the CMDB and change logs[cite: 48, 49, 158].",
+    agent=root_cause_investigator,
+    expected_output="Specific, causal root cause determination for each pattern supported by evidence[cite: 73, 137].",
+    context=[detection_task, correlation_task]
+)
+
+# 4. Known Error Documentation (Stage 4)
+error_authoring_task = Task(
+    description="Document the root cause and provide a clear workaround for the Service Desk. Create a formal Known Error record[cite: 58, 59, 62].",
+    agent=known_error_author,
+    expected_output="Well-formed Known Error records (JSON/Markdown) including root_cause, workaround, and permanent_fix[cite: 125, 150].",
+    context=[investigation_task]
+)
+
+# 5. Resolution via Change (Stage 5)
+change_proposal_task = Task(
+    description="Generate a formal Request for Change (RFC) for a permanent fix. Include risk ratings, testing requirements, and a rollback plan[cite: 63, 64, 132].",
+    agent=change_proposer,
+    expected_output="RFC documents including risk ratings, implementation plans, and scheduling[cite: 73, 139].",
+    context=[investigation_task, error_authoring_task]
 )

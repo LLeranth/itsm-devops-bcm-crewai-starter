@@ -1,1 +1,22 @@
+﻿# Virtual Environment
+venv/
+.venv/
+env/
+
+# Environment Variables (Sensitive/Local paths)
 .env
+
+# Python Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# CrewAI/IDE specific
+.vscode/
+.idea/
+outputs/
+*.log
+
+# Data (Optional: ignore if files are too large, but usually kept for assignments)
+# data/
