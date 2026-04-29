@@ -36,16 +36,17 @@ def calculate_impact(service_name: str, hours_outage: int):
     }
     return impacts
 
-@tool("query_cmdb")
+@tool
 def query_cmdb(ci_id: str):
-    """Queries the CMDB for CI details, owners, and downstream dependencies."""
-    path = os.getenv('CMDB_DATA_PATH', 'data/finserve_cmdb.csv')
-    try:
-        df = pd.read_csv(path)
-        result = df[df['ci_id'] == ci_id]
-        return result.to_dict(orient='records')
-    except:
-        return f"CI {ci_id} not found. Simulated fallback: Owner=Infrastructure, Environment=Prod."
+    """Searches the CMDB for a specific Configuration Item ID or Name."""
+    import pandas as pd
+    df = pd.read_csv('data/finserve_cmdb.csv')
+    
+    # This change makes it search for the text ANYWHERE in the row
+    # It also handles case-sensitivity (e.g., 'db' matches 'DB')
+    result = df[df.apply(lambda row: row.astype(str).str.contains(ci_id, case=False).any(), axis=1)]
+    
+    return result.to_dict(orient='records')
 
 # --- 3. NEW PRODUCTION TOOLS (Requirement 2) ---
 

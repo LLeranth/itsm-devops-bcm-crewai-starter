@@ -3,20 +3,31 @@ from crewai import Crew, Process
 from .agents import ProblemManagementAgents
 from .tasks import ProblemManagementTasks
 
-def create_problem_crew():
+def create_problem_crew(llm): # <--- 1. Accept the llm here
     # 1. Initialize Agents and Tasks
     agents = ProblemManagementAgents()
     tasks = ProblemManagementTasks()
 
-    # 2. Define the specific Agents (Updated to match our new agents.py)
+    # 2. Define the specific Agents and assign the local LLM
     classifier = agents.incident_classifier()
-    secops     = agents.secops_analyst()
-    bia        = agents.business_impact_analyst()
-    recovery   = agents.recovery_engineer()
-    change     = agents.change_manager()
-    comms      = agents.stakeholder_communicator()
+    classifier.llm = llm # <--- 2. Force agent to use Ollama
+    
+    secops = agents.secops_analyst()
+    secops.llm = llm
+    
+    bia = agents.business_impact_analyst()
+    bia.llm = llm
+    
+    recovery = agents.recovery_engineer()
+    recovery.llm = llm
+    
+    change = agents.change_manager()
+    change.llm = llm
+    
+    comms = agents.stakeholder_communicator()
+    comms.llm = llm
 
-    # 3. Define the Tasks and their sequence (Updated to match our new tasks.py)
+    # 3. Define the Tasks (no changes needed here)
     t1 = tasks.triage_task(classifier)
     t2 = tasks.containment_task(secops, t1)
     t3 = tasks.quantitative_analysis_task(bia, t2)

@@ -32,7 +32,11 @@ class ProblemManagementAgents:
             goal="Quantify non-linear financial risk and identify regulatory breach points.",
             backstory="""Certified CBCP and ISO 22301 expert. You translate technical 
             outages into business terms. You focus on the 'Cost Escalation Curve' and 
-            ensure that Tier-1 service RTOs are prioritized to avoid GDPR/PCI-DSS fines.""",
+            ensure that Tier-1 service RTOs are prioritized to avoid GDPR/PCI-DSS fines.
+            
+            IMPORTANT: When using the 'calculate_impact' tool, you MUST provide 'hours_outage' 
+            as a single integer (e.g., 1). If you need to check multiple intervals like 1, 2, and 4 hours, 
+            you MUST call the tool three separate times. NEVER pass a list or a string like '[1, 2, 4]'.""",
             tools=[calculate_impact, get_service_catalog, check_compliance_status, assess_vendor_impact],
             verbose=True,
             memory=True
