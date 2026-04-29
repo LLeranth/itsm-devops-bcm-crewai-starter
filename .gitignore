@@ -1,22 +1,46 @@
-﻿# Virtual Environment
-venv/
-.venv/
-env/
-
-# Environment Variables (Sensitive/Local paths)
+﻿# --- Environment & Credentials ---
 .env
+.env.local
+.env.*
+secrets.py
 
-# Python Bytecode
+# --- Python Virtual Environment ---
+.venv/
+venv/
+env/
+ENV/
+bin/
+lib/
+include/
+Scripts/
+pyvenv.cfg
+
+# --- Python Caches & Artifacts ---
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
 
-# CrewAI/IDE specific
+# --- CrewAI & LLM Specific ---
+# Ignore local ChromaDB or vector store if you use memory features
+db/
+*.sqlite3
+# Ignore local logs and large model files
+*.log
+models/
+
+# --- Project Specific ---
+# We generally DO NOT ignore /data if we want the instructor to see the CSVs.
+# But we DO ignore the /output folder so your generated reports don't clutter Git.
+output/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
-outputs/
-*.log
-
-# Data (Optional: ignore if files are too large, but usually kept for assignments)
-# data/
